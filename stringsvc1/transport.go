@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
@@ -65,6 +64,6 @@ func decodeCountRequest(_ context.Context, r *http.Request) (interface{}, error)
 }
 
 func encodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
-	log.Println(ctx.Value(ctxManager{"request"}))
+	// log.Println(ctx.Value(ctxManager{"request"}))
 	return json.NewEncoder(w).Encode(response)
 }
