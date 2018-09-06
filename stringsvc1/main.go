@@ -1,91 +1,61 @@
 package main
 
 import (
-	"context"
-	"log"
 	"net/http"
 	"os"
-	"time"
 
-	kitlog "github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log"
+	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	httptransport "github.com/go-kit/kit/transport/http"
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type ctxManager struct {
 	name string
 }
 
-// type Middleware func(endpoint.Endpoint) endpoint.Endpoint
-
-// func loggingMiddleware(logger kitlog.Logger) Middleware {
-// 	return func(next endpoint.Endpoint) endpoint.Endpoint {
-// 		return func(ctx context.Context, request interface{}) (interface{}, error) {
-// 			logger.Log("msg", "calling endpoint")
-// 			defer logger.Log("msg", "called endpoint")
-// 			return next(ctx, request)
-// 		}
-// 	}
-// }
-
-type loggingMiddleware struct {
-	logger kitlog.Logger
-	next   StringService
-}
-
-func (mw loggingMiddleware) Uppercase(ctx context.Context, s string) (output string, err error) {
-	defer func(begin time.Time) {
-		mw.logger.Log(
-			"method", "uppercase",
-			"input", s,
-			"output", output,
-			"err", err,
-			"took", time.Since(begin),
-		)
-	}(time.Now())
-
-	output, err = mw.next.Uppercase(ctx, s)
-	return
-}
-
-func (mw loggingMiddleware) Count(ctx context.Context, s string) (n int) {
-	defer func(begin time.Time) {
-		mw.logger.Log(
-			"method", "count",
-			"input", s,
-			"n", n,
-			"took", time.Since(begin),
-		)
-	}(time.Now())
-
-	n = mw.Count(ctx, s)
-	return
-}
-
 func main() {
-	logger := kitlog.NewLogfmtLogger(os.Stderr)
+	logger := log.NewLogfmtLogger(os.Stderr)
 
 	// svc := stringService{}
 
 	// var uppercase endpoint.Endpoint
 	// uppercase = makeUppercaseEndpoint(svc)
-	// uppercase = loggingMiddleware(kitlog.With(logger, "method", "uppercase"))(uppercase)
+	// uppercase = loggingMiddleware(log.With(logger, "method", "uppercase"))(uppercase)
 
 	// var count endpoint.Endpoint
 	// count = makeCountEndpoint(svc)
-	// count = loggingMiddleware(kitlog.With(logger, "method", "count"))(count)
+	// count = loggingMiddleware(log.With(logger, "method", "count"))(count)
+	fieldKeys := []string{"method", "error"}
+	requestCount := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
+		Namespace: "my_group",
+		Subsystem: "string_service",
+		Name:      "request_count",
+		Help:      "Number of requests received.",
+	}, fieldKeys)
+	requestLatency := kitprometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
+		Namespace: "my_group",
+		Subsystem: "string_service",
+		Name:      "request_latency_microseconds",
+		Help:      "Total duration of requests in microseconds.",
+	}, fieldKeys)
+	countResult := kitprometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
+		Namespace: "my_group",
+		Subsystem: "string_service",
+		Name:      "count_result",
+		Help:      "The result of each count method.",
+	}, []string{}) // no fields here
 
 	var svc StringService
 	svc = stringService{}
 	svc = loggingMiddleware{logger, svc}
+	svc = instrumentingMiddleware{requestCount, requestLatency, countResult, svc}
 
 	uppercaseHandler := httptransport.NewServer(
 		makeUppercaseEndpoint(svc),
 		decodeUppercaseRequest,
 		encodeResponse,
-		httptransport.ServerBefore(func(ctx context.Context, r *http.Request) context.Context {
-			ctx = context.WithValue(ctx, ctxManager{"request"}, r)
-			return ctx
-		}),
 	)
 
 	countHandler := httptransport.NewServer(
@@ -96,5 +66,7 @@ func main() {
 
 	http.Handle("/uppercase", uppercaseHandler)
 	http.Handle("/count", countHandler)
-	log.Fatal(http.ListenAndServe(":8088", nil))
+	http.Handle("/metrics", promhttp.Handler())
+	logger.Log("msg", "HTTP", "addr", ":8088")
+	logger.Log("err", http.ListenAndServe(":8088", nil))
 }
