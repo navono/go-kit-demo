@@ -1,0 +1,13 @@
+github.com/drhodes/golorem v0.0.0-20160418191928-ecccc744c2d9 h1:EQOZw/LCQ0SM4sNez3EhUf9gQalQrLrs4mPtmQa+d58=
+github.com/drhodes/golorem v0.0.0-20160418191928-ecccc744c2d9/go.mod h1:NsKVpF4h4j13Vm6Cx7Kf0V03aJKjfaStvm5rvK4+FyQ=
+github.com/go-kit/kit v0.8.0 h1:Wz+5lgoB0kkuqLEc6NVmwRknTKP6dTGbSqvhZtBI/j0=
+github.com/go-kit/kit v0.8.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=
+github.com/go-logfmt/logfmt v0.4.0 h1:MP4Eh7ZCb31lleYCFuwm0oe4/YGak+5l1vA2NOE80nA=
+github.com/go-logfmt/logfmt v0.4.0/go.mod h1:3RMwSq7FuexP4Kalkev3ejPJsZTpXXBr9+V4qmtdjCk=
+github.com/gorilla/mux v1.6.2 h1:Pgr17XVTNXAk3q/r4CpKzC5xBM/qW1uVLV+IhRZpIIk=
+github.com/gorilla/mux v1.6.2/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
+github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515/go.mod h1:+0opPa2QZZtGFBFZlji/RkVcI2GknAs/DXo4wKdlNEc=
+github.com/navono/gokit-todo v0.0.0-20180831020803-866daa0ff2f6 h1:ZgFOPNZacKhxsrY/JwmfphL/YAwSoF3FOjrSNbCTzjE=
+github.com/navono/gokit-todo v0.0.0-20180831020803-866daa0ff2f6/go.mod h1:R1BKsKfZF8pP78yrFPBdVKHFQEhJkXVekRQMda0iGJM=
+gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce h1:xcEWjVhvbDy+nHP67nPDDpbYrY+ILlfndk4bRioVHaU=
+gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce/go.mod h1:yeKp02qBN3iKW1OzL3MGk2IdtZzaj7SFntXj72NppTA=
