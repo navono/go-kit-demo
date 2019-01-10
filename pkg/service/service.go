@@ -16,6 +16,7 @@ type Service interface {
 	Paragraph(min, max int) string
 }
 
+// NewLoremService create lorem server instance
 func NewLoremService() Service {
 	return &loremService{}
 }
